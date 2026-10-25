@@ -30,7 +30,7 @@ func TestDoneTask(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	// действие, которое проверяем: помечаем задачу выполненной по её ID
+	// взял ID созданной задачи и передал в DoneTask
 	done, err := uc.DoneTask(task.ID)
 	if err != nil {
 		// ошибки быть не должно: задача существует
@@ -40,5 +40,15 @@ func TestDoneTask(t *testing.T) {
 	// главная проверка: статус должен стать "done"
 	if done.Status != "done" {
 		t.Fatalf("expected status done, got %q", done.Status)
+	}
+}
+
+func TestDoneTaskNotFound(t *testing.T) {
+	repo := repository.NewInMemoryRepo() // чистое хранилище, чтобы тест не зависел от других
+	uc := NewTaskUsecase(repo)           // usecase поверх этого хранилища
+
+	_, err := uc.DoneTask(999)
+	if err == nil {
+		t.Fatal("expected error, got nil")
 	}
 }
