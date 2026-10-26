@@ -9,7 +9,7 @@ type TaskUsecase interface {
 	GetTask(id int) (repository.Task, error)                       // получение задачи по id
 	ListTask() ([]repository.Task, error)                          // получение всех задач
 	DeleteTask(id int) error
-	DoneTask(id int) (repository.Task, error)
+	DoneTask(id int) (repository.Task, error)// статус дон
 }
 
 // taskUsecase — конкретная реализация интерфейса TaskUsecase
