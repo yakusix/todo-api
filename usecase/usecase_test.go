@@ -43,12 +43,25 @@ func TestDoneTask(t *testing.T) {
 	}
 }
 
-func TestDoneTaskNotFound(t *testing.T) {
+func TestDoneTaskNotFound(t *testing.T) { // тест на проверки ошибки TaskNotFound
 	repo := repository.NewInMemoryRepo() // чистое хранилище, чтобы тест не зависел от других
 	uc := NewTaskUsecase(repo)           // usecase поверх этого хранилища
 
 	_, err := uc.DoneTask(999)
-	if err == nil {
+	if err == nil { // если все ок тест падает ПРОВЕРЯЕМ ОШИБКУ
 		t.Fatal("expected error, got nil")
 	}
 }
+
+
+ func TestGetTaskNotFound(t *testing.T){// тест для проверки ошибки получения задания 
+	repo:=repository.NewInMemoryRepo()// чистое хранилище, чтобы тест не зависел от других
+	uc := NewTaskUsecase(repo)           // usecase поверх этого хранилища
+	
+	
+
+	_,err:=uc.GetTask(999)
+	if err==nil{
+		t.Fatal("expected error, got nil")
+	}
+ }
