@@ -73,22 +73,22 @@ func TestDeleteTaskNotFound(t *testing.T) { // тест на проверку у
 	}
 }
 
-func TestDeleteTask (t *testing.T) {// тест для делит
-	repo:=repository.NewInMemoryRepo()
-	uc:=NewTaskUsecase(repo)
+func TestDeleteTask(t *testing.T) { // тест для делит
+	repo := repository.NewInMemoryRepo()
+	uc := NewTaskUsecase(repo)
 
-	task,err:=uc.CreateTask("тест","описание")//есть ли задача
-	if err!=nil{
+	task, err := uc.CreateTask("тест", "описание") //есть ли задача
+	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	err=uc.DeleteTask(task.ID)//удаляем и проверяем
-	if err!=nil{
+	err = uc.DeleteTask(task.ID) //удаляем и проверяем
+	if err != nil {
 		t.Fatalf("unexpected error deletetask: %v", err)
 
 	}
 
-	_,err=uc.GetTask(task.ID)//если задача есть ОШИБКА
-	if err==nil{
+	_, err = uc.GetTask(task.ID) //если задача есть ОШИБКА
+	if err == nil {
 		t.Fatalf("expected error after delete, got nil")
 	}
 }

@@ -3,6 +3,7 @@ package repository
 import (
 	"fmt"
 	"sort"
+	"sync"
 )
 
 type Task struct {
@@ -23,6 +24,7 @@ type TaskRepository interface {
 type InMemoryRepo struct {
 	data   map[int]Task
 	nextID int
+	mu     sync.Mutex
 }
 
 func NewInMemoryRepo() *InMemoryRepo {
@@ -34,6 +36,8 @@ func NewInMemoryRepo() *InMemoryRepo {
 }
 
 func (r *InMemoryRepo) Delete(id int) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
 	_, ok := r.data[id]
 	if !ok {
 		return fmt.Errorf("task not found")
@@ -45,10 +49,13 @@ func (r *InMemoryRepo) Delete(id int) error {
 
 }
 func (r *InMemoryRepo) Create(task Task) (Task, error) {
-	task.ID = r.nextID
-	r.nextID = r.nextID + 1
-	r.data[task.ID] = task //Правильно так: «в map r.data по ключу task.ID кладём значение task». Ключ это ID, значение это сама задача.
-	return task, nil
+
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	task.ID = r.nextID      // присваиваем задаче следующий свободный ID из счётчика репозитория
+	r.nextID = r.nextID + 1 // сдвигаем счётчик, чтобы следующая задача получила другой ID
+	r.data[task.ID] = task  // кладём задачу в map: ключ это её ID, значение это сама задача
+	return task, nil        // возвращаем задачу уже с присвоенным ID; nil значит «ошибки нет»
 }
 
 //(r *InMemoryRepo) — ресивер, указатель, чтобы менять реальную map r.data, а не копию
@@ -57,6 +64,8 @@ func (r *InMemoryRepo) Create(task Task) (Task, error) {
 //return nil — сообщаем, что ошибки не было (успешно создали)
 
 func (r *InMemoryRepo) GetByID(id int) (Task, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
 	task, ok := r.data[id] //ищем задачу по айди в map, ok будет true если нашли, false если нет
 	if !ok {
 		return Task{}, fmt.Errorf("task not found") //возврашаем пустую задачу и ошибку
@@ -66,6 +75,9 @@ func (r *InMemoryRepo) GetByID(id int) (Task, error) {
 }
 
 func (r *InMemoryRepo) List() ([]Task, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
 	tasks := make([]Task, 0, len(r.data)) //создаём слайс задач, длина 0, ёмкость равна количеству задач в map
 	for _, task := range r.data {         // ключ не нужен, поэтому используем _, task
 		tasks = append(tasks, task) //добавляем каждую задачу в слайс
@@ -76,6 +88,8 @@ func (r *InMemoryRepo) List() ([]Task, error) {
 	return tasks, nil //возврашаем слайс задач и nil, если всё ок
 }
 func (r *InMemoryRepo) Done(id int) (Task, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
 	task, ok := r.data[id] //ищем задачу по айди
 	if !ok {
 		return Task{}, fmt.Errorf("task not found")
