@@ -1,0 +1,6 @@
+CREATE TABLE tasks(
+    ID  INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    Title TEXT NOT NULL,
+    Description TEXT,
+    Status TEXT NOT NULL DEFAULT 'new'  
+);
