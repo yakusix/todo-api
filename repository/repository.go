@@ -8,9 +8,9 @@ import (
 
 type Task struct {
 	ID          int
-	Title       string
-	Description string
-	Status      string
+	Title       string // название
+	Description string //описание
+	Status      string //статус
 }
 
 type TaskRepository interface {
